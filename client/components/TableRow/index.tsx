@@ -13,8 +13,11 @@ interface TableRowProps extends MaterialTableRowProps {
 }
 
 const SmallerTypography = styled(Typography)({
+	margin: "auto",
 	fontSize: "0.75rem",
+	maxWidth: "8vw",
 });
+
 const TableRow = ({ index, company }: TableRowProps) => {
 	const theme = useTheme();
 	const locations = company.location.join(", ");
@@ -43,9 +46,7 @@ const TableRow = ({ index, company }: TableRowProps) => {
 			</TableCell>
 
 			<TableCell>
-				<Stack direction="column" sx={{ maxWidth: "8vw" }}>
-					<SmallerTypography>{locations}</SmallerTypography>
-				</Stack>
+				<SmallerTypography>{locations}</SmallerTypography>
 			</TableCell>
 
 			<TableCell>{company.category}</TableCell>
