@@ -1,8 +1,15 @@
-import { Box, Grid, GridProps, Stack, StackProps, Typography } from "@mui/material";
+import { Box, Grid, GridProps, Stack, StackProps, Typography, FormControl } from "@mui/material";
+import { Input } from "components";
 import styled from "styled-components";
 import { uiColor } from "styles/styles";
 
 export const ProfileContainer = styled(Box)`
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+`;
+
+export const UpdateProfileContainer = styled.form`
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -47,7 +54,13 @@ export const MainInfo = ({ heading, text }: MainInfoProps) => {
 			<Typography color={uiColor.darkestGray} fontWeight={"600"} fontSize={"0.8rem"} variant="h5">
 				{heading}
 			</Typography>
-			<Typography marginTop={"0.5em"} fontSize={"1.2rem"} color={uiColor.darkestGray} variant="body1">
+			<Typography
+				marginTop={"0.5em"}
+				fontSize={"1.2rem"}
+				letterSpacing={"0.5px"}
+				color={uiColor.darkestGray}
+				variant="body1"
+			>
 				{text}
 			</Typography>
 		</Stack>
@@ -66,12 +79,61 @@ interface InfoProps extends GridProps {
 export const Info = ({ heading, text, width, xs }: InfoProps) => {
 	return (
 		<Grid item xs={xs} width={width}>
-			<Typography color={uiColor.darkestGray} fontWeight={"600"} fontSize={"0.8rem"} variant="h6">
+			<Typography color={uiColor.darkestGray} fontWeight={"600"} fontSize={"0.6rem"} variant="h6">
 				{heading}
 			</Typography>
-			<Typography sx={{ wordBreak: "break-word" }} marginTop={"0.3em"} color={uiColor.darkestGray} variant="body1">
+			<Typography
+				sx={{ wordBreak: "break-word" }}
+				fontSize={"0.7rem"}
+				marginTop={"0.3em"}
+				color={uiColor.darkestGray}
+				variant="body1"
+			>
 				{text}
 			</Typography>
+		</Grid>
+	);
+};
+
+interface UpdateInfoProps extends GridProps {
+	heading: string;
+	text: string;
+	fullWidth?: boolean;
+}
+
+export const UpdateInfo = ({ heading, text, width, xs, fullWidth }: UpdateInfoProps) => {
+	return (
+		<Grid
+			item
+			xs={xs}
+			width={width}
+			sx={{
+				"& .MuiFormControl-root": {
+					width: "100%",
+				},
+			}}
+		>
+			<Typography color={uiColor.darkestGray} fontWeight={"600"} fontSize={"0.6rem"} variant="h6">
+				{heading}
+			</Typography>
+			<FormControl>
+				<Input
+					sx={{
+						"& .MuiInputBase-formControl": {
+							borderRadius: "8px",
+							marginTop: "0.4em",
+						},
+						"& .MuiInputBase-inputSizeSmall": {
+							fontSize: "0.7rem",
+							padding: "6px 14px",
+							letterSpacing: "0.5px",
+						},
+					}}
+					size="small"
+					fullWidth={fullWidth}
+					defaultValue={text}
+				/>
+			</FormControl>
 		</Grid>
 	);
 };
@@ -147,7 +209,45 @@ export const StudentDetails = ({ student }: StudentDetailsProps) => {
 		</InfoGrid>
 	);
 };
+interface UpdateStudentDetailsProps {
+	student: Student;
+}
 
+export const UpdateStudentDetails = ({ student }: UpdateStudentDetailsProps) => {
+	return (
+		<InfoGrid container rowGap={"3em"} columnGap={"2%"}>
+			<UpdateInfo width={"18%"} heading="Date Of Birth" text={student.dateOfBirth} />
+			<UpdateInfo width={"18%"} heading="Gender" text={student.gender} />
+			<UpdateInfo width={"18%"} heading="Caste" text={student.caste} />
+			<UpdateInfo width={"18%"} heading="Height" text={`${student.height} CMS`} />
+			<UpdateInfo width={"18%"} heading="Weight" text={`${student.weight} KGS`} />
+			<Info width={"30%"} heading="Learner ID" text={student.learnerID} />
+			<Info width={"33%"} heading="Email ID" text={student.emailID} />
+			<UpdateInfo width={"33%"} heading="Alt Email ID" text={student.altEmailID} />
+			<UpdateInfo width={"23%"} heading="Mobile Number" text={student.mobileNumber} />
+			<UpdateInfo width={"23%"} heading="Alt Mobile Number" text={student.altMobileNumber} />
+			<UpdateInfo width={"23%"} heading="Skype ID" text={student.skypeID} />
+			<UpdateInfo width={"23%"} heading="LinkedIn ID" text={student.linkedInID} />
+			<UpdateInfo width={"23%"} heading="Father’s Name" text={student.father.name} />
+			<UpdateInfo width={"23%"} heading="Father’s Mobile Number" text={student.father.mobileNumber} />
+			<UpdateInfo width={"23%"} heading="Father’s Occupation" text={student.father.occupation} />
+			<UpdateInfo width={"23%"} heading="Father’s Organization" text={student.father.organization} />
+			<UpdateInfo width={"23%"} heading="Mother’s Name" text={student.mother.name} />
+			<UpdateInfo width={"23%"} heading="Mother’s Mobile Number" text={student.mother.mobileNumber} />
+			<UpdateInfo width={"23%"} heading="Mother’s Occupation" text={student.mother.occupation} />
+			<UpdateInfo width={"23%"} heading="Mother’s Organization" text={student.mother.organization} />
+			<UpdateInfo width={"23%"} heading="Passport Number" text={student.passportNumber} />
+			<UpdateInfo width={"23%"} heading="Aadhar Number" text={student.aadharNumber} />
+			<UpdateInfo width={"23%"} heading="PAN Number" text={student.panNumber} />
+			<UpdateInfo width={"23%"} heading="Physical Disability" text={student.physicalDisability} />
+			<UpdateInfo width={"23%"} heading="City" text={student.city} />
+			<UpdateInfo width={"23%"} heading="State" text={student.country} />
+			<UpdateInfo width={"23%"} heading="Country" text={student.country} />
+			<UpdateInfo width={"100%"} heading="Permanent Address" text={student.permanentAddress} />
+			<UpdateInfo width={"100%"} heading="Current Address" text={student.currentAddress} />
+		</InfoGrid>
+	);
+};
 export const AcademicInfoContainer = styled(Stack)`
 	flex-direction: row;
 	justify-content: space-between;
@@ -226,6 +326,60 @@ export const SchoolDetails = ({ board, country, heading, percentage, school, yea
 				<Info width={"20%"} heading="Board" text={board} />
 				<Info width={"20%"} heading="Year Of Completion" text={yearOfCompletion} />
 				<Info width={"20%"} heading="Country" text={country} />
+			</Stack>
+		</Box>
+	);
+};
+
+interface UpdateEntranceTestProps {
+	jeeMainsRank?: string;
+	jeeAdvancedRank?: string;
+	metRank?: string;
+}
+
+export const UpdateEntranceTest = ({ metRank, jeeAdvancedRank, jeeMainsRank }: UpdateEntranceTestProps) => {
+	return (
+		<Box sx={{ margin: "1em 0" }}>
+			<Typography color={uiColor.gray} fontWeight={"600"} fontSize={"0.8rem"} variant="h5">
+				{"Entrance Test"}
+			</Typography>
+			<Stack direction={"row"} justifyContent={"space-between"} marginTop={"1em"}>
+				<UpdateInfo width={"30%"} heading="JEE Mains Rank" text={jeeMainsRank ?? "-"} />
+				<UpdateInfo width={"30%"} heading="JEE Advanced" text={jeeAdvancedRank ?? "-"} />
+				<UpdateInfo width={"30%"} heading="MET Rank" text={metRank ?? "-"} />
+			</Stack>
+		</Box>
+	);
+};
+
+interface UpdateSchoolDetailProps {
+	percentage: number;
+	school: string;
+	board: string;
+	yearOfCompletion: string;
+	country: string;
+	heading: string;
+}
+
+export const UpdateSchoolDetails = ({
+	board,
+	country,
+	heading,
+	percentage,
+	school,
+	yearOfCompletion,
+}: UpdateSchoolDetailProps) => {
+	return (
+		<Box sx={{ margin: "2em 0" }}>
+			<Typography color={uiColor.gray} fontWeight={"600"} fontSize={"0.8rem"} variant="h5">
+				{heading}
+			</Typography>
+			<Stack direction={"row"} justifyContent={"space-between"} marginTop={"1em"} gap={"2%"}>
+				<UpdateInfo width={"20%"} heading="Percentage" text={`${percentage.toString()}%`} />
+				<UpdateInfo width={"30%"} heading="School" text={school} />
+				<UpdateInfo width={"20%"} heading="Board" text={board} />
+				<UpdateInfo width={"20%"} heading="Year Of Completion" text={yearOfCompletion} />
+				<UpdateInfo width={"20%"} heading="Country" text={country} />
 			</Stack>
 		</Box>
 	);
