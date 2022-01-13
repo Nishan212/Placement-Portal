@@ -6,26 +6,35 @@ import React from "react";
 import {
 	PersonalDetails,
 	MainInfo,
-	ProfileContainer,
 	AcademicDetails,
 	SectionHeading,
 	MainInfoRow,
-	InfoGrid,
 	Info,
 	AcademicInfoContainer,
 	AcademicRecordContainer,
 	Semester,
+	UpdateProfileContainer,
 	UpdateEntranceTest,
 	UpdateSchoolDetails,
 	UpdateStudentDetails,
 } from "../Profile.styled";
 import { entranceTest, schoolDetails, semesterData, student } from "../data";
-import { useRouter } from "next/router";
+import { useUpdateProfile } from "../hooks";
 
 const ProfileUpdate = () => {
-	const router = useRouter();
+	const { register, handleFormSubmit, errors, watch, control } = useUpdateProfile({
+		personalDetails: student,
+		academicDetails: {
+			entranceTest,
+			tenth: schoolDetails[0],
+			twelfth: schoolDetails[1].fieldName === "academicDetails.twelfth" ? schoolDetails[1] : undefined,
+			diploma: schoolDetails[1].fieldName === "academicDetails.diploma" ? schoolDetails[1] : undefined,
+		},
+	});
+
 	return (
-		<ProfileContainer>
+		<UpdateProfileContainer onSubmit={handleFormSubmit}>
+			<pre>{JSON.stringify(watch(), null, 2)}</pre>
 			<PersonalDetails>
 				<SectionHeading>Personal Details</SectionHeading>
 				<MainInfoRow>
@@ -41,14 +50,9 @@ const ProfileUpdate = () => {
 					<MainInfo heading="First Name" text="John" />
 					<MainInfo heading="Middle Name" text="Anthony" />
 					<MainInfo heading="Last Name" text="Doe" />
-					<Button
-						sx={{ height: "2.5em", borderRadius: "24px" }}
-						text="Save"
-						onClick={() => alert("Profile Updated!")}
-						endIcon={<Save />}
-					/>
+					<Button type="submit" sx={{ height: "2.5em", borderRadius: "24px" }} text="Save" endIcon={<Save />} />
 				</MainInfoRow>
-				<UpdateStudentDetails student={student} />
+				<UpdateStudentDetails student={student} register={register} control={control} errors={errors} />
 			</PersonalDetails>
 			<AcademicDetails>
 				<SectionHeading>Academic Details</SectionHeading>
@@ -66,21 +70,28 @@ const ProfileUpdate = () => {
 						metRank={entranceTest.metRank}
 						jeeAdvancedRank={entranceTest.jeeAdvancedRank}
 						jeeMainsRank={entranceTest.jeeMainsRank}
+						register={register}
+						control={control}
+						errors={errors}
 					/>
 				</AcademicRecordContainer>
-				{schoolDetails.map(({ board, country, heading, percentage, school, yearOfCompletion }) => (
+				{schoolDetails.map(({ board, fieldName, country, heading, percentage, school, yearOfCompletion }) => (
 					<UpdateSchoolDetails
+						control={control}
+						errors={errors}
 						key={heading}
 						board={board}
 						country={country}
 						heading={heading}
 						percentage={percentage}
 						school={school}
+						fieldName={fieldName}
+						register={register}
 						yearOfCompletion={yearOfCompletion}
 					/>
 				))}
 			</AcademicDetails>
-		</ProfileContainer>
+		</UpdateProfileContainer>
 	);
 };
 

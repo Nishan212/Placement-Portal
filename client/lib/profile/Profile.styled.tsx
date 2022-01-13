@@ -1,7 +1,9 @@
 import { Box, Grid, GridProps, Stack, StackProps, Typography, FormControl } from "@mui/material";
 import { Input } from "components";
+import { Controller, UseFormRegister, Control, FieldError, FieldErrors, FieldName } from "react-hook-form";
 import styled from "styled-components";
 import { uiColor } from "styles/styles";
+import { FormInput, Student } from "./types";
 
 export const ProfileContainer = styled(Box)`
 	display: flex;
@@ -99,9 +101,12 @@ interface UpdateInfoProps extends GridProps {
 	heading: string;
 	text: string;
 	fullWidth?: boolean;
+	name: Extract<keyof FormInput, string> | string;
+	control: Control<FormInput, object>;
+	error: string | undefined;
 }
 
-export const UpdateInfo = ({ heading, text, width, xs, fullWidth }: UpdateInfoProps) => {
+export const UpdateInfo = ({ heading, text, width, xs, fullWidth, control, name, error }: UpdateInfoProps) => {
 	return (
 		<Grid
 			item
@@ -117,59 +122,37 @@ export const UpdateInfo = ({ heading, text, width, xs, fullWidth }: UpdateInfoPr
 				{heading}
 			</Typography>
 			<FormControl>
-				<Input
-					sx={{
-						"& .MuiInputBase-formControl": {
-							borderRadius: "8px",
-							marginTop: "0.4em",
-						},
-						"& .MuiInputBase-inputSizeSmall": {
-							fontSize: "0.7rem",
-							padding: "6px 14px",
-							letterSpacing: "0.5px",
-						},
-					}}
-					size="small"
-					fullWidth={fullWidth}
-					defaultValue={text}
+				<Controller
+					control={control}
+					name={name as Extract<keyof FormInput, string>}
+					render={({ field: { ref, ...fields } }) => (
+						<Input
+							error={!!error}
+							helperText={error}
+							sx={{
+								"& .MuiInputBase-formControl": {
+									borderRadius: "8px",
+									marginTop: "0.4em",
+								},
+								"& .MuiInputBase-inputSizeSmall": {
+									fontSize: "0.7rem",
+									padding: "6px 14px",
+									letterSpacing: "0.5px",
+								},
+							}}
+							size="small"
+							fullWidth={fullWidth}
+							defaultValue={text}
+							{...fields}
+							inputRef={ref}
+						/>
+					)}
 				/>
 			</FormControl>
 		</Grid>
 	);
 };
 
-interface Parent {
-	name: string;
-	mobileNumber: string;
-	occupation: string;
-	organization: string;
-}
-
-interface Student {
-	dateOfBirth: string;
-	gender: string;
-	caste: string;
-	height: string;
-	weight: string;
-	learnerID: string;
-	emailID: string;
-	altEmailID: string;
-	linkedInID: string;
-	mobileNumber: string;
-	altMobileNumber: string;
-	skypeID: string;
-	physicalDisability: string;
-	father: Parent;
-	mother: Parent;
-	passportNumber: string;
-	aadharNumber: string;
-	panNumber: string;
-	city: string;
-	state: string;
-	country: string;
-	permanentAddress: string;
-	currentAddress: string;
-}
 interface StudentDetailsProps {
 	student: Student;
 }
@@ -197,9 +180,9 @@ export const StudentDetails = ({ student }: StudentDetailsProps) => {
 			<Info width={"25%"} heading="Mother’s Mobile Number" text={student.mother.mobileNumber} />
 			<Info width={"25%"} heading="Mother’s Occupation" text={student.mother.occupation} />
 			<Info width={"25%"} heading="Mother’s Organization" text={student.mother.organization} />
-			<Info width={"25%"} heading="Passport Number" text={student.passportNumber} />
+			<Info width={"25%"} heading="Passport Number" text={student.passportNumber ?? "-"} />
 			<Info width={"25%"} heading="Aadhar Number" text={student.aadharNumber} />
-			<Info width={"25%"} heading="PAN Number" text={student.panNumber} />
+			<Info width={"25%"} heading="PAN Number" text={student.panNumber ?? "-"} />
 			<Info width={"25%"} heading="Physical Disability" text={student.physicalDisability} />
 			<Info width={"25%"} heading="City" text={student.city} />
 			<Info width={"25%"} heading="State" text={student.country} />
@@ -211,40 +194,234 @@ export const StudentDetails = ({ student }: StudentDetailsProps) => {
 };
 interface UpdateStudentDetailsProps {
 	student: Student;
+	register: UseFormRegister<FormInput>;
+	control: Control<FormInput, object>;
+	errors: FieldErrors<FormInput>;
 }
 
-export const UpdateStudentDetails = ({ student }: UpdateStudentDetailsProps) => {
+export const UpdateStudentDetails = ({ student, register, control, errors }: UpdateStudentDetailsProps) => {
 	return (
 		<InfoGrid container rowGap={"3em"} columnGap={"2%"}>
-			<UpdateInfo width={"18%"} heading="Date Of Birth" text={student.dateOfBirth} />
-			<UpdateInfo width={"18%"} heading="Gender" text={student.gender} />
-			<UpdateInfo width={"18%"} heading="Caste" text={student.caste} />
-			<UpdateInfo width={"18%"} heading="Height" text={`${student.height} CMS`} />
-			<UpdateInfo width={"18%"} heading="Weight" text={`${student.weight} KGS`} />
+			<UpdateInfo
+				control={control}
+				width={"18%"}
+				heading="Date Of Birth"
+				text={student.dateOfBirth}
+				name={register("personalDetails.dateOfBirth").name}
+				error={errors.personalDetails?.dateOfBirth?.message}
+			/>
+			<UpdateInfo
+				control={control}
+				error={errors.personalDetails?.gender?.message}
+				width={"18%"}
+				heading="Gender"
+				text={student.gender}
+				name={register("personalDetails.gender").name}
+			/>
+			<UpdateInfo
+				control={control}
+				width={"18%"}
+				heading="Caste"
+				text={student.caste}
+				onChange={register("personalDetails.caste").onChange}
+				name={register("personalDetails.caste").name}
+				error={errors.personalDetails?.caste?.message}
+			/>
+			<UpdateInfo
+				control={control}
+				width={"18%"}
+				heading="Height"
+				text={`${student.height} CMS`}
+				onChange={register("personalDetails.height").onChange}
+				name={register("personalDetails.height").name}
+				error={errors.personalDetails?.height?.message}
+			/>
+			<UpdateInfo
+				control={control}
+				width={"18%"}
+				heading="Weight"
+				text={`${student.weight} KGS`}
+				name={register("personalDetails.weight").name}
+				error={errors.personalDetails?.weight?.message}
+			/>
 			<Info width={"30%"} heading="Learner ID" text={student.learnerID} />
 			<Info width={"33%"} heading="Email ID" text={student.emailID} />
-			<UpdateInfo width={"33%"} heading="Alt Email ID" text={student.altEmailID} />
-			<UpdateInfo width={"23%"} heading="Mobile Number" text={student.mobileNumber} />
-			<UpdateInfo width={"23%"} heading="Alt Mobile Number" text={student.altMobileNumber} />
-			<UpdateInfo width={"23%"} heading="Skype ID" text={student.skypeID} />
-			<UpdateInfo width={"23%"} heading="LinkedIn ID" text={student.linkedInID} />
-			<UpdateInfo width={"23%"} heading="Father’s Name" text={student.father.name} />
-			<UpdateInfo width={"23%"} heading="Father’s Mobile Number" text={student.father.mobileNumber} />
-			<UpdateInfo width={"23%"} heading="Father’s Occupation" text={student.father.occupation} />
-			<UpdateInfo width={"23%"} heading="Father’s Organization" text={student.father.organization} />
-			<UpdateInfo width={"23%"} heading="Mother’s Name" text={student.mother.name} />
-			<UpdateInfo width={"23%"} heading="Mother’s Mobile Number" text={student.mother.mobileNumber} />
-			<UpdateInfo width={"23%"} heading="Mother’s Occupation" text={student.mother.occupation} />
-			<UpdateInfo width={"23%"} heading="Mother’s Organization" text={student.mother.organization} />
-			<UpdateInfo width={"23%"} heading="Passport Number" text={student.passportNumber} />
-			<UpdateInfo width={"23%"} heading="Aadhar Number" text={student.aadharNumber} />
-			<UpdateInfo width={"23%"} heading="PAN Number" text={student.panNumber} />
-			<UpdateInfo width={"23%"} heading="Physical Disability" text={student.physicalDisability} />
-			<UpdateInfo width={"23%"} heading="City" text={student.city} />
-			<UpdateInfo width={"23%"} heading="State" text={student.country} />
-			<UpdateInfo width={"23%"} heading="Country" text={student.country} />
-			<UpdateInfo width={"100%"} heading="Permanent Address" text={student.permanentAddress} />
-			<UpdateInfo width={"100%"} heading="Current Address" text={student.currentAddress} />
+			<UpdateInfo
+				control={control}
+				width={"33%"}
+				heading="Alt Email ID"
+				text={student.altEmailID}
+				name={register("personalDetails.altEmailID").name}
+				error={errors.personalDetails?.altEmailID?.message}
+			/>
+			<UpdateInfo
+				control={control}
+				width={"23%"}
+				heading="Mobile Number"
+				text={student.mobileNumber}
+				name={register("personalDetails.mobileNumber").name}
+				error={errors.personalDetails?.mobileNumber?.message}
+			/>
+			<UpdateInfo
+				control={control}
+				width={"23%"}
+				heading="Alt Mobile Number"
+				text={student.altMobileNumber}
+				name={register("personalDetails.altMobileNumber").name}
+				error={errors.personalDetails?.altMobileNumber?.message}
+			/>
+			<UpdateInfo
+				control={control}
+				width={"23%"}
+				heading="Skype ID"
+				text={student.skypeID}
+				name={register("personalDetails.skypeID").name}
+				error={errors.personalDetails?.skypeID?.message}
+			/>
+			<UpdateInfo
+				control={control}
+				width={"23%"}
+				heading="LinkedIn ID"
+				text={student.linkedInID}
+				name={register("personalDetails.linkedInID").name}
+				error={errors.personalDetails?.linkedInID?.message}
+			/>
+			<UpdateInfo
+				control={control}
+				width={"23%"}
+				heading="Father’s Name"
+				text={student.father.name}
+				name={register("personalDetails.father.name").name}
+				error={errors.personalDetails?.father?.name?.message}
+			/>
+			<UpdateInfo
+				control={control}
+				width={"23%"}
+				heading="Father’s Mobile Number"
+				text={student.father.mobileNumber}
+				name={register("personalDetails.father.mobileNumber").name}
+				error={errors.personalDetails?.father?.mobileNumber?.message}
+			/>
+			<UpdateInfo
+				control={control}
+				width={"23%"}
+				heading="Father’s Occupation"
+				text={student.father.occupation}
+				name={register("personalDetails.father.occupation").name}
+				error={errors.personalDetails?.father?.occupation?.message}
+			/>
+			<UpdateInfo
+				control={control}
+				width={"23%"}
+				heading="Father’s Organization"
+				text={student.father.organization}
+				name={register("personalDetails.father.organization").name}
+				error={errors.personalDetails?.father?.organization?.message}
+			/>
+			<UpdateInfo
+				control={control}
+				width={"23%"}
+				heading="Mother’s Name"
+				text={student.mother.name}
+				name={register("personalDetails.mother.name").name}
+				error={errors.personalDetails?.mother?.name?.message}
+			/>
+			<UpdateInfo
+				control={control}
+				width={"23%"}
+				heading="Mother’s Mobile Number"
+				text={student.mother.mobileNumber}
+				name={register("personalDetails.mother.mobileNumber").name}
+				error={errors.personalDetails?.mother?.mobileNumber?.message}
+			/>
+			<UpdateInfo
+				control={control}
+				width={"23%"}
+				heading="Mother’s Occupation"
+				text={student.mother.occupation}
+				name={register("personalDetails.mother.occupation").name}
+				error={errors.personalDetails?.mother?.occupation?.message}
+			/>
+			<UpdateInfo
+				control={control}
+				width={"23%"}
+				heading="Mother’s Organization"
+				text={student.mother.organization}
+				name={register("personalDetails.mother.organization").name}
+				error={errors.personalDetails?.mother?.organization?.message}
+			/>
+			<UpdateInfo
+				control={control}
+				width={"23%"}
+				heading="Passport Number"
+				text={student.passportNumber ?? "-"}
+				name={register("personalDetails.passportNumber").name}
+				error={errors.personalDetails?.passportNumber?.message}
+			/>
+			<UpdateInfo
+				control={control}
+				width={"23%"}
+				heading="Aadhar Number"
+				text={student.aadharNumber}
+				name={register("personalDetails.aadharNumber").name}
+				error={errors.personalDetails?.aadharNumber?.message}
+			/>
+			<UpdateInfo
+				control={control}
+				width={"23%"}
+				heading="PAN Number"
+				text={student.panNumber ?? "-"}
+				name={register("personalDetails.panNumber").name}
+				error={errors.personalDetails?.panNumber?.message}
+			/>
+			<UpdateInfo
+				control={control}
+				width={"23%"}
+				heading="Physical Disability"
+				text={student.physicalDisability}
+				name={register("personalDetails.physicalDisability").name}
+				error={errors.personalDetails?.physicalDisability?.message}
+			/>
+			<UpdateInfo
+				control={control}
+				width={"23%"}
+				heading="City"
+				text={student.city}
+				name={register("personalDetails.city").name}
+				error={errors.personalDetails?.city?.message}
+			/>
+			<UpdateInfo
+				control={control}
+				width={"23%"}
+				heading="State"
+				text={student.country}
+				name={register("personalDetails.state").name}
+				error={errors.personalDetails?.state?.message}
+			/>
+			<UpdateInfo
+				control={control}
+				width={"23%"}
+				heading="Country"
+				text={student.country}
+				name={register("personalDetails.country").name}
+				error={errors.personalDetails?.country?.message}
+			/>
+			<UpdateInfo
+				control={control}
+				width={"100%"}
+				heading="Permanent Address"
+				text={student.permanentAddress}
+				name={register("personalDetails.permanentAddress").name}
+				error={errors.personalDetails?.permanentAddress?.message}
+			/>
+			<UpdateInfo
+				control={control}
+				width={"100%"}
+				heading="Current Address"
+				text={student.currentAddress}
+				name={register("personalDetails.currentAddress").name}
+				error={errors.personalDetails?.currentAddress?.message}
+			/>
 		</InfoGrid>
 	);
 };
@@ -335,18 +512,52 @@ interface UpdateEntranceTestProps {
 	jeeMainsRank?: string;
 	jeeAdvancedRank?: string;
 	metRank?: string;
+	register: UseFormRegister<FormInput>;
+	control: Control<FormInput, object>;
+	errors: FieldErrors<FormInput>;
 }
 
-export const UpdateEntranceTest = ({ metRank, jeeAdvancedRank, jeeMainsRank }: UpdateEntranceTestProps) => {
+export const UpdateEntranceTest = ({
+	metRank,
+	jeeAdvancedRank,
+	jeeMainsRank,
+	register,
+	control,
+	errors,
+}: UpdateEntranceTestProps) => {
 	return (
 		<Box sx={{ margin: "1em 0" }}>
 			<Typography color={uiColor.gray} fontWeight={"600"} fontSize={"0.8rem"} variant="h5">
 				{"Entrance Test"}
 			</Typography>
 			<Stack direction={"row"} justifyContent={"space-between"} marginTop={"1em"}>
-				<UpdateInfo width={"30%"} heading="JEE Mains Rank" text={jeeMainsRank ?? "-"} />
-				<UpdateInfo width={"30%"} heading="JEE Advanced" text={jeeAdvancedRank ?? "-"} />
-				<UpdateInfo width={"30%"} heading="MET Rank" text={metRank ?? "-"} />
+				<UpdateInfo
+					control={control}
+					width={"30%"}
+					heading="JEE Mains Rank"
+					text={jeeMainsRank ?? "-"}
+					onChange={register("academicDetails.entranceTest.jeeMainsRank").onChange}
+					name={register("academicDetails.entranceTest.jeeMainsRank").name}
+					error={errors.academicDetails?.entranceTest?.jeeMainsRank?.message}
+				/>
+				<UpdateInfo
+					control={control}
+					width={"30%"}
+					heading="JEE Advanced"
+					text={jeeAdvancedRank ?? "-"}
+					onChange={register("academicDetails.entranceTest.jeeAdvancedRank").onChange}
+					name={register("academicDetails.entranceTest.jeeAdvancedRank").name}
+					error={errors.academicDetails?.entranceTest?.jeeAdvancedRank?.message}
+				/>
+				<UpdateInfo
+					control={control}
+					width={"30%"}
+					heading="MET Rank"
+					text={metRank ?? "-"}
+					onChange={register("academicDetails.entranceTest.metRank").onChange}
+					name={register("academicDetails.entranceTest.metRank").name}
+					error={errors.academicDetails?.entranceTest?.metRank?.message}
+				/>
 			</Stack>
 		</Box>
 	);
@@ -359,6 +570,15 @@ interface UpdateSchoolDetailProps {
 	yearOfCompletion: string;
 	country: string;
 	heading: string;
+	control: Control<FormInput, object>;
+	errors: {
+		[key: string]:
+			| FieldError
+			| undefined
+			| { [key: string]: FieldError | undefined | { [key: string]: FieldError | undefined } };
+	};
+	register: UseFormRegister<FormInput>;
+	fieldName: "academicDetails.tenth" | "academicDetails.twelfth" | "academicDetails.diploma";
 }
 
 export const UpdateSchoolDetails = ({
@@ -368,6 +588,10 @@ export const UpdateSchoolDetails = ({
 	percentage,
 	school,
 	yearOfCompletion,
+	fieldName,
+	register,
+	control,
+	errors,
 }: UpdateSchoolDetailProps) => {
 	return (
 		<Box sx={{ margin: "2em 0" }}>
@@ -375,11 +599,47 @@ export const UpdateSchoolDetails = ({
 				{heading}
 			</Typography>
 			<Stack direction={"row"} justifyContent={"space-between"} marginTop={"1em"} gap={"2%"}>
-				<UpdateInfo width={"20%"} heading="Percentage" text={`${percentage.toString()}%`} />
-				<UpdateInfo width={"30%"} heading="School" text={school} />
-				<UpdateInfo width={"20%"} heading="Board" text={board} />
-				<UpdateInfo width={"20%"} heading="Year Of Completion" text={yearOfCompletion} />
-				<UpdateInfo width={"20%"} heading="Country" text={country} />
+				{/* TODO: Errors do not display in these fields */}
+				<UpdateInfo
+					control={control}
+					error={errors[fieldName]?.message as string}
+					name={register(`${fieldName}.percentage`).name}
+					width={"20%"}
+					heading="Percentage"
+					text={`${percentage.toString()}%`}
+				/>
+				<UpdateInfo
+					control={control}
+					error={errors[`${fieldName}.school`]?.message as string}
+					name={register(`${fieldName}.school`).name}
+					width={"30%"}
+					heading="School"
+					text={school}
+				/>
+				<UpdateInfo
+					control={control}
+					error={errors[`${fieldName}.board`]?.message as string}
+					name={register(`${fieldName}.board`).name}
+					width={"20%"}
+					heading="Board"
+					text={board}
+				/>
+				<UpdateInfo
+					control={control}
+					error={errors[`${fieldName}.yearOfCompletion`]?.message as string}
+					name={register(`${fieldName}.yearOfCompletion`).name}
+					width={"20%"}
+					heading="Year Of Completion"
+					text={yearOfCompletion}
+				/>
+				<UpdateInfo
+					control={control}
+					error={errors[`${fieldName}.country`]?.message as string}
+					name={register(`${fieldName}.country`).name}
+					width={"20%"}
+					heading="Country"
+					text={country}
+				/>
 			</Stack>
 		</Box>
 	);

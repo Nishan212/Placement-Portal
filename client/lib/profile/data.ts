@@ -51,6 +51,10 @@ export const schoolDetails = [
 		yearOfCompletion: "2016",
 		country: "India",
 		heading: "Class 10th",
+		fieldName: "academicDetails.tenth" as
+			| "academicDetails.tenth"
+			| "academicDetails.twelfth"
+			| "academicDetails.diploma",
 	},
 	{
 		percentage: 97.3,
@@ -59,6 +63,10 @@ export const schoolDetails = [
 		yearOfCompletion: "2018",
 		country: "India",
 		heading: "Class 12th",
+		fieldName: "academicDetails.twelfth" as
+			| "academicDetails.tenth"
+			| "academicDetails.twelfth"
+			| "academicDetails.diploma",
 	},
 ];
 
