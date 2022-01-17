@@ -1,9 +1,11 @@
+import React from "react";
 import { Box, Grid, GridProps, Stack, StackProps, Typography, FormControl } from "@mui/material";
-import { Input } from "components";
-import { Controller, UseFormRegister, Control, FieldError, FieldErrors, FieldName } from "react-hook-form";
+import { Input, ComboBox } from "components";
+import { Controller, UseFormRegister, Control, FieldError, FieldErrors } from "react-hook-form";
 import styled from "styled-components";
 import { uiColor } from "styles/styles";
 import { FormInput, Student } from "./types";
+import { ComboBoxProps } from "components/ComboBox";
 
 export const ProfileContainer = styled(Box)`
 	display: flex;
@@ -11,7 +13,7 @@ export const ProfileContainer = styled(Box)`
 	align-items: center;
 `;
 
-export const UpdateProfileContainer = styled.form`
+export const UpdateProfileForm = styled.form`
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -78,7 +80,7 @@ interface InfoProps extends GridProps {
 	text: string;
 }
 
-export const Info = ({ heading, text, width, xs }: InfoProps) => {
+export const Info = React.memo(({ heading, text, width, xs }: InfoProps) => {
 	return (
 		<Grid item xs={xs} width={width}>
 			<Typography color={uiColor.darkestGray} fontWeight={"600"} fontSize={"0.6rem"} variant="h6">
@@ -95,9 +97,9 @@ export const Info = ({ heading, text, width, xs }: InfoProps) => {
 			</Typography>
 		</Grid>
 	);
-};
+});
 
-interface UpdateInfoProps extends GridProps {
+interface UpdateInfoTextProps extends GridProps {
 	heading: string;
 	text: string;
 	fullWidth?: boolean;
@@ -106,52 +108,126 @@ interface UpdateInfoProps extends GridProps {
 	error: string | undefined;
 }
 
-export const UpdateInfo = ({ heading, text, width, xs, fullWidth, control, name, error }: UpdateInfoProps) => {
-	return (
-		<Grid
-			item
-			xs={xs}
-			width={width}
-			sx={{
-				"& .MuiFormControl-root": {
-					width: "100%",
-				},
-			}}
-		>
-			<Typography color={uiColor.darkestGray} fontWeight={"600"} fontSize={"0.6rem"} variant="h6">
-				{heading}
-			</Typography>
-			<FormControl>
-				<Controller
-					control={control}
-					name={name as Extract<keyof FormInput, string>}
-					render={({ field: { ref, ...fields } }) => (
-						<Input
-							error={!!error}
-							helperText={error}
-							sx={{
-								"& .MuiInputBase-formControl": {
-									borderRadius: "8px",
-									marginTop: "0.4em",
-								},
-								"& .MuiInputBase-inputSizeSmall": {
-									fontSize: "0.7rem",
-									padding: "6px 14px",
-									letterSpacing: "0.5px",
-								},
-							}}
-							size="small"
-							fullWidth={fullWidth}
-							defaultValue={text}
-							{...fields}
-							inputRef={ref}
-						/>
-					)}
-				/>
-			</FormControl>
-		</Grid>
-	);
-};
+export const UpdateInfoText = React.memo(
+	({ heading, text, width, xs, fullWidth, control, name, error }: UpdateInfoTextProps) => {
+		return (
+			<Grid
+				item
+				xs={xs}
+				width={width}
+				sx={{
+					"& .MuiFormControl-root": {
+						width: "100%",
+					},
+				}}
+			>
+				<Typography color={uiColor.darkestGray} fontWeight={"600"} fontSize={"0.6rem"} variant="h6">
+					{heading}
+				</Typography>
+				<FormControl>
+					<Controller
+						control={control}
+						name={name as Extract<keyof FormInput, string>}
+						render={({ field: { ref, ...fields } }) => (
+							<Input
+								error={!!error}
+								helperText={error}
+								sx={{
+									"& .MuiInputBase-formControl": {
+										borderRadius: "8px",
+										marginTop: "0.4em",
+									},
+									"& .MuiInputBase-inputSizeSmall": {
+										fontSize: "0.7rem",
+										padding: "6px 14px",
+										letterSpacing: "0.5px",
+									},
+								}}
+								size="small"
+								fullWidth={fullWidth}
+								defaultValue={text}
+								{...fields}
+								inputRef={ref}
+							/>
+						)}
+					/>
+				</FormControl>
+			</Grid>
+		);
+	}
+);
+
+interface UpdateInfoSelectProps
+	extends Omit<GridProps, "defaultValue">,
+		Pick<ComboBoxProps<string>, "options" | "defaultValue"> {
+	heading: string;
+	text: string;
+	fullWidth?: boolean;
+	name: Extract<keyof FormInput, string> | string;
+	control: Control<FormInput, object>;
+	error: string | undefined;
+}
+
+export const UpdateInfoSelect = React.memo(
+	({ heading, text, width, xs, fullWidth, control, name, error, options }: UpdateInfoSelectProps) => {
+		return (
+			<Grid
+				item
+				xs={xs}
+				width={width}
+				sx={{
+					"& .MuiFormControl-root": {
+						width: "100%",
+					},
+				}}
+			>
+				<Typography color={uiColor.darkestGray} fontWeight={"600"} fontSize={"0.6rem"} variant="h6">
+					{heading}
+				</Typography>
+				<FormControl>
+					<Controller
+						name={name as Extract<keyof FormInput, string>}
+						control={control}
+						render={({ field: { onChange, ref, value, ...props } }) => (
+							<ComboBox
+								error={!!error}
+								helperText={error}
+								size="small"
+								inputSx={{
+									"& .MuiInputBase-formControl": {
+										borderRadius: "8px",
+										marginTop: "0.4em",
+									},
+									"& .MuiAutocomplete-inputRoot": {
+										padding: "3.5px",
+									},
+									"& .MuiInputBase-inputSizeSmall": {
+										fontSize: "0.7rem",
+										padding: "6px 14px",
+										letterSpacing: "0.5px",
+									},
+									"& .MuiAutocomplete-clearIndicator svg": {
+										width: "0.8em",
+										height: "0.8em",
+									},
+									"& .MuiAutocomplete-endAdornment": {
+										top: "calc(50% - 17px)",
+										right: "0 !important",
+									},
+								}}
+								fullWidth={fullWidth}
+								defaultValue={[text]}
+								options={options}
+								onChange={(e, data) => onChange(data)}
+								{...props}
+							/>
+						)}
+					/>
+				</FormControl>
+			</Grid>
+		);
+	}
+);
 
 interface StudentDetailsProps {
 	student: Student;
@@ -202,7 +278,7 @@ interface UpdateStudentDetailsProps {
 export const UpdateStudentDetails = ({ student, register, control, errors }: UpdateStudentDetailsProps) => {
 	return (
 		<InfoGrid container rowGap={"3em"} columnGap={"2%"}>
-			<UpdateInfo
+			<UpdateInfoText
 				control={control}
 				width={"18%"}
 				heading="Date Of Birth"
@@ -210,7 +286,8 @@ export const UpdateStudentDetails = ({ student, register, control, errors }: Upd
 				name={register("personalDetails.dateOfBirth").name}
 				error={errors.personalDetails?.dateOfBirth?.message}
 			/>
-			<UpdateInfo
+			<UpdateInfoSelect
+				options={["Male", "Female", "Transgender", "Non-binary", "Prefer not to respond"]}
 				control={control}
 				error={errors.personalDetails?.gender?.message}
 				width={"18%"}
@@ -218,7 +295,7 @@ export const UpdateStudentDetails = ({ student, register, control, errors }: Upd
 				text={student.gender}
 				name={register("personalDetails.gender").name}
 			/>
-			<UpdateInfo
+			<UpdateInfoText
 				control={control}
 				width={"18%"}
 				heading="Caste"
@@ -227,7 +304,7 @@ export const UpdateStudentDetails = ({ student, register, control, errors }: Upd
 				name={register("personalDetails.caste").name}
 				error={errors.personalDetails?.caste?.message}
 			/>
-			<UpdateInfo
+			<UpdateInfoText
 				control={control}
 				width={"18%"}
 				heading="Height"
@@ -236,7 +313,7 @@ export const UpdateStudentDetails = ({ student, register, control, errors }: Upd
 				name={register("personalDetails.height").name}
 				error={errors.personalDetails?.height?.message}
 			/>
-			<UpdateInfo
+			<UpdateInfoText
 				control={control}
 				width={"18%"}
 				heading="Weight"
@@ -246,7 +323,7 @@ export const UpdateStudentDetails = ({ student, register, control, errors }: Upd
 			/>
 			<Info width={"30%"} heading="Learner ID" text={student.learnerID} />
 			<Info width={"33%"} heading="Email ID" text={student.emailID} />
-			<UpdateInfo
+			<UpdateInfoText
 				control={control}
 				width={"33%"}
 				heading="Alt Email ID"
@@ -254,7 +331,7 @@ export const UpdateStudentDetails = ({ student, register, control, errors }: Upd
 				name={register("personalDetails.altEmailID").name}
 				error={errors.personalDetails?.altEmailID?.message}
 			/>
-			<UpdateInfo
+			<UpdateInfoText
 				control={control}
 				width={"23%"}
 				heading="Mobile Number"
@@ -262,7 +339,7 @@ export const UpdateStudentDetails = ({ student, register, control, errors }: Upd
 				name={register("personalDetails.mobileNumber").name}
 				error={errors.personalDetails?.mobileNumber?.message}
 			/>
-			<UpdateInfo
+			<UpdateInfoText
 				control={control}
 				width={"23%"}
 				heading="Alt Mobile Number"
@@ -270,7 +347,7 @@ export const UpdateStudentDetails = ({ student, register, control, errors }: Upd
 				name={register("personalDetails.altMobileNumber").name}
 				error={errors.personalDetails?.altMobileNumber?.message}
 			/>
-			<UpdateInfo
+			<UpdateInfoText
 				control={control}
 				width={"23%"}
 				heading="Skype ID"
@@ -278,7 +355,7 @@ export const UpdateStudentDetails = ({ student, register, control, errors }: Upd
 				name={register("personalDetails.skypeID").name}
 				error={errors.personalDetails?.skypeID?.message}
 			/>
-			<UpdateInfo
+			<UpdateInfoText
 				control={control}
 				width={"23%"}
 				heading="LinkedIn ID"
@@ -286,7 +363,7 @@ export const UpdateStudentDetails = ({ student, register, control, errors }: Upd
 				name={register("personalDetails.linkedInID").name}
 				error={errors.personalDetails?.linkedInID?.message}
 			/>
-			<UpdateInfo
+			<UpdateInfoText
 				control={control}
 				width={"23%"}
 				heading="Father’s Name"
@@ -294,7 +371,7 @@ export const UpdateStudentDetails = ({ student, register, control, errors }: Upd
 				name={register("personalDetails.father.name").name}
 				error={errors.personalDetails?.father?.name?.message}
 			/>
-			<UpdateInfo
+			<UpdateInfoText
 				control={control}
 				width={"23%"}
 				heading="Father’s Mobile Number"
@@ -302,7 +379,7 @@ export const UpdateStudentDetails = ({ student, register, control, errors }: Upd
 				name={register("personalDetails.father.mobileNumber").name}
 				error={errors.personalDetails?.father?.mobileNumber?.message}
 			/>
-			<UpdateInfo
+			<UpdateInfoText
 				control={control}
 				width={"23%"}
 				heading="Father’s Occupation"
@@ -310,7 +387,7 @@ export const UpdateStudentDetails = ({ student, register, control, errors }: Upd
 				name={register("personalDetails.father.occupation").name}
 				error={errors.personalDetails?.father?.occupation?.message}
 			/>
-			<UpdateInfo
+			<UpdateInfoText
 				control={control}
 				width={"23%"}
 				heading="Father’s Organization"
@@ -318,7 +395,7 @@ export const UpdateStudentDetails = ({ student, register, control, errors }: Upd
 				name={register("personalDetails.father.organization").name}
 				error={errors.personalDetails?.father?.organization?.message}
 			/>
-			<UpdateInfo
+			<UpdateInfoText
 				control={control}
 				width={"23%"}
 				heading="Mother’s Name"
@@ -326,7 +403,7 @@ export const UpdateStudentDetails = ({ student, register, control, errors }: Upd
 				name={register("personalDetails.mother.name").name}
 				error={errors.personalDetails?.mother?.name?.message}
 			/>
-			<UpdateInfo
+			<UpdateInfoText
 				control={control}
 				width={"23%"}
 				heading="Mother’s Mobile Number"
@@ -334,7 +411,7 @@ export const UpdateStudentDetails = ({ student, register, control, errors }: Upd
 				name={register("personalDetails.mother.mobileNumber").name}
 				error={errors.personalDetails?.mother?.mobileNumber?.message}
 			/>
-			<UpdateInfo
+			<UpdateInfoText
 				control={control}
 				width={"23%"}
 				heading="Mother’s Occupation"
@@ -342,7 +419,7 @@ export const UpdateStudentDetails = ({ student, register, control, errors }: Upd
 				name={register("personalDetails.mother.occupation").name}
 				error={errors.personalDetails?.mother?.occupation?.message}
 			/>
-			<UpdateInfo
+			<UpdateInfoText
 				control={control}
 				width={"23%"}
 				heading="Mother’s Organization"
@@ -350,7 +427,7 @@ export const UpdateStudentDetails = ({ student, register, control, errors }: Upd
 				name={register("personalDetails.mother.organization").name}
 				error={errors.personalDetails?.mother?.organization?.message}
 			/>
-			<UpdateInfo
+			<UpdateInfoText
 				control={control}
 				width={"23%"}
 				heading="Passport Number"
@@ -358,7 +435,7 @@ export const UpdateStudentDetails = ({ student, register, control, errors }: Upd
 				name={register("personalDetails.passportNumber").name}
 				error={errors.personalDetails?.passportNumber?.message}
 			/>
-			<UpdateInfo
+			<UpdateInfoText
 				control={control}
 				width={"23%"}
 				heading="Aadhar Number"
@@ -366,7 +443,7 @@ export const UpdateStudentDetails = ({ student, register, control, errors }: Upd
 				name={register("personalDetails.aadharNumber").name}
 				error={errors.personalDetails?.aadharNumber?.message}
 			/>
-			<UpdateInfo
+			<UpdateInfoText
 				control={control}
 				width={"23%"}
 				heading="PAN Number"
@@ -374,7 +451,7 @@ export const UpdateStudentDetails = ({ student, register, control, errors }: Upd
 				name={register("personalDetails.panNumber").name}
 				error={errors.personalDetails?.panNumber?.message}
 			/>
-			<UpdateInfo
+			<UpdateInfoText
 				control={control}
 				width={"23%"}
 				heading="Physical Disability"
@@ -382,7 +459,7 @@ export const UpdateStudentDetails = ({ student, register, control, errors }: Upd
 				name={register("personalDetails.physicalDisability").name}
 				error={errors.personalDetails?.physicalDisability?.message}
 			/>
-			<UpdateInfo
+			<UpdateInfoText
 				control={control}
 				width={"23%"}
 				heading="City"
@@ -390,7 +467,7 @@ export const UpdateStudentDetails = ({ student, register, control, errors }: Upd
 				name={register("personalDetails.city").name}
 				error={errors.personalDetails?.city?.message}
 			/>
-			<UpdateInfo
+			<UpdateInfoText
 				control={control}
 				width={"23%"}
 				heading="State"
@@ -398,7 +475,7 @@ export const UpdateStudentDetails = ({ student, register, control, errors }: Upd
 				name={register("personalDetails.state").name}
 				error={errors.personalDetails?.state?.message}
 			/>
-			<UpdateInfo
+			<UpdateInfoText
 				control={control}
 				width={"23%"}
 				heading="Country"
@@ -406,7 +483,7 @@ export const UpdateStudentDetails = ({ student, register, control, errors }: Upd
 				name={register("personalDetails.country").name}
 				error={errors.personalDetails?.country?.message}
 			/>
-			<UpdateInfo
+			<UpdateInfoText
 				control={control}
 				width={"100%"}
 				heading="Permanent Address"
@@ -414,7 +491,7 @@ export const UpdateStudentDetails = ({ student, register, control, errors }: Upd
 				name={register("personalDetails.permanentAddress").name}
 				error={errors.personalDetails?.permanentAddress?.message}
 			/>
-			<UpdateInfo
+			<UpdateInfoText
 				control={control}
 				width={"100%"}
 				heading="Current Address"
@@ -443,7 +520,7 @@ interface SemesterProps {
 	dateChanges: number;
 }
 
-export const Semester = ({ semesterNum, backlogs, dateChanges, gpa }: SemesterProps) => {
+export const Semester = React.memo(({ semesterNum, backlogs, dateChanges, gpa }: SemesterProps) => {
 	return (
 		<Box sx={{ margin: "1em 0" }}>
 			<Typography
@@ -459,7 +536,7 @@ export const Semester = ({ semesterNum, backlogs, dateChanges, gpa }: SemesterPr
 			</Stack>
 		</Box>
 	);
-};
+});
 
 interface EntranceTestProps {
 	jeeMainsRank?: string;
@@ -467,7 +544,7 @@ interface EntranceTestProps {
 	metRank?: string;
 }
 
-export const EntranceTest = ({ metRank, jeeAdvancedRank, jeeMainsRank }: EntranceTestProps) => {
+export const EntranceTest = React.memo(({ metRank, jeeAdvancedRank, jeeMainsRank }: EntranceTestProps) => {
 	return (
 		<Box sx={{ margin: "1em 0" }}>
 			<Typography color={uiColor.gray} fontWeight={"600"} fontSize={"0.8rem"} variant="h5">
@@ -480,7 +557,7 @@ export const EntranceTest = ({ metRank, jeeAdvancedRank, jeeMainsRank }: Entranc
 			</Stack>
 		</Box>
 	);
-};
+});
 
 interface SchoolDetailProps {
 	percentage: number;
@@ -491,22 +568,24 @@ interface SchoolDetailProps {
 	heading: string;
 }
 
-export const SchoolDetails = ({ board, country, heading, percentage, school, yearOfCompletion }: SchoolDetailProps) => {
-	return (
-		<Box sx={{ margin: "2em 0" }}>
-			<Typography color={uiColor.gray} fontWeight={"600"} fontSize={"0.8rem"} variant="h5">
-				{heading}
-			</Typography>
-			<Stack direction={"row"} justifyContent={"space-between"} marginTop={"1em"}>
-				<Info width={"20%"} heading="Percentage" text={`${percentage.toString()}%`} />
-				<Info width={"30%"} heading="School" text={school} />
-				<Info width={"20%"} heading="Board" text={board} />
-				<Info width={"20%"} heading="Year Of Completion" text={yearOfCompletion} />
-				<Info width={"20%"} heading="Country" text={country} />
-			</Stack>
-		</Box>
-	);
-};
+export const SchoolDetails = React.memo(
+	({ board, country, heading, percentage, school, yearOfCompletion }: SchoolDetailProps) => {
+		return (
+			<Box sx={{ margin: "2em 0" }}>
+				<Typography color={uiColor.gray} fontWeight={"600"} fontSize={"0.8rem"} variant="h5">
+					{heading}
+				</Typography>
+				<Stack direction={"row"} justifyContent={"space-between"} marginTop={"1em"}>
+					<Info width={"20%"} heading="Percentage" text={`${percentage.toString()}%`} />
+					<Info width={"30%"} heading="School" text={school} />
+					<Info width={"20%"} heading="Board" text={board} />
+					<Info width={"20%"} heading="Year Of Completion" text={yearOfCompletion} />
+					<Info width={"20%"} heading="Country" text={country} />
+				</Stack>
+			</Box>
+		);
+	}
+);
 
 interface UpdateEntranceTestProps {
 	jeeMainsRank?: string;
@@ -517,51 +596,46 @@ interface UpdateEntranceTestProps {
 	errors: FieldErrors<FormInput>;
 }
 
-export const UpdateEntranceTest = ({
-	metRank,
-	jeeAdvancedRank,
-	jeeMainsRank,
-	register,
-	control,
-	errors,
-}: UpdateEntranceTestProps) => {
-	return (
-		<Box sx={{ margin: "1em 0" }}>
-			<Typography color={uiColor.gray} fontWeight={"600"} fontSize={"0.8rem"} variant="h5">
-				{"Entrance Test"}
-			</Typography>
-			<Stack direction={"row"} justifyContent={"space-between"} marginTop={"1em"}>
-				<UpdateInfo
-					control={control}
-					width={"30%"}
-					heading="JEE Mains Rank"
-					text={jeeMainsRank ?? "-"}
-					onChange={register("academicDetails.entranceTest.jeeMainsRank").onChange}
-					name={register("academicDetails.entranceTest.jeeMainsRank").name}
-					error={errors.academicDetails?.entranceTest?.jeeMainsRank?.message}
-				/>
-				<UpdateInfo
-					control={control}
-					width={"30%"}
-					heading="JEE Advanced"
-					text={jeeAdvancedRank ?? "-"}
-					onChange={register("academicDetails.entranceTest.jeeAdvancedRank").onChange}
-					name={register("academicDetails.entranceTest.jeeAdvancedRank").name}
-					error={errors.academicDetails?.entranceTest?.jeeAdvancedRank?.message}
-				/>
-				<UpdateInfo
-					control={control}
-					width={"30%"}
-					heading="MET Rank"
-					text={metRank ?? "-"}
-					onChange={register("academicDetails.entranceTest.metRank").onChange}
-					name={register("academicDetails.entranceTest.metRank").name}
-					error={errors.academicDetails?.entranceTest?.metRank?.message}
-				/>
-			</Stack>
-		</Box>
-	);
-};
+export const UpdateEntranceTest = React.memo(
+	({ metRank, jeeAdvancedRank, jeeMainsRank, register, control, errors }: UpdateEntranceTestProps) => {
+		return (
+			<Box sx={{ margin: "1em 0" }}>
+				<Typography color={uiColor.gray} fontWeight={"600"} fontSize={"0.8rem"} variant="h5">
+					{"Entrance Test"}
+				</Typography>
+				<Stack direction={"row"} justifyContent={"space-between"} marginTop={"1em"}>
+					<UpdateInfoText
+						control={control}
+						width={"30%"}
+						heading="JEE Mains Rank"
+						text={jeeMainsRank ?? "-"}
+						onChange={register("academicDetails.entranceTest.jeeMainsRank").onChange}
+						name={register("academicDetails.entranceTest.jeeMainsRank").name}
+						error={errors.academicDetails?.entranceTest?.jeeMainsRank?.message}
+					/>
+					<UpdateInfoText
+						control={control}
+						width={"30%"}
+						heading="JEE Advanced"
+						text={jeeAdvancedRank ?? "-"}
+						onChange={register("academicDetails.entranceTest.jeeAdvancedRank").onChange}
+						name={register("academicDetails.entranceTest.jeeAdvancedRank").name}
+						error={errors.academicDetails?.entranceTest?.jeeAdvancedRank?.message}
+					/>
+					<UpdateInfoText
+						control={control}
+						width={"30%"}
+						heading="MET Rank"
+						text={metRank ?? "-"}
+						onChange={register("academicDetails.entranceTest.metRank").onChange}
+						name={register("academicDetails.entranceTest.metRank").name}
+						error={errors.academicDetails?.entranceTest?.metRank?.message}
+					/>
+				</Stack>
+			</Box>
+		);
+	}
+);
 
 interface UpdateSchoolDetailProps {
 	percentage: number;
@@ -581,66 +655,68 @@ interface UpdateSchoolDetailProps {
 	fieldName: "academicDetails.tenth" | "academicDetails.twelfth" | "academicDetails.diploma";
 }
 
-export const UpdateSchoolDetails = ({
-	board,
-	country,
-	heading,
-	percentage,
-	school,
-	yearOfCompletion,
-	fieldName,
-	register,
-	control,
-	errors,
-}: UpdateSchoolDetailProps) => {
-	return (
-		<Box sx={{ margin: "2em 0" }}>
-			<Typography color={uiColor.gray} fontWeight={"600"} fontSize={"0.8rem"} variant="h5">
-				{heading}
-			</Typography>
-			<Stack direction={"row"} justifyContent={"space-between"} marginTop={"1em"} gap={"2%"}>
-				{/* TODO: Errors do not display in these fields */}
-				<UpdateInfo
-					control={control}
-					error={errors[fieldName]?.message as string}
-					name={register(`${fieldName}.percentage`).name}
-					width={"20%"}
-					heading="Percentage"
-					text={`${percentage.toString()}%`}
-				/>
-				<UpdateInfo
-					control={control}
-					error={errors[`${fieldName}.school`]?.message as string}
-					name={register(`${fieldName}.school`).name}
-					width={"30%"}
-					heading="School"
-					text={school}
-				/>
-				<UpdateInfo
-					control={control}
-					error={errors[`${fieldName}.board`]?.message as string}
-					name={register(`${fieldName}.board`).name}
-					width={"20%"}
-					heading="Board"
-					text={board}
-				/>
-				<UpdateInfo
-					control={control}
-					error={errors[`${fieldName}.yearOfCompletion`]?.message as string}
-					name={register(`${fieldName}.yearOfCompletion`).name}
-					width={"20%"}
-					heading="Year Of Completion"
-					text={yearOfCompletion}
-				/>
-				<UpdateInfo
-					control={control}
-					error={errors[`${fieldName}.country`]?.message as string}
-					name={register(`${fieldName}.country`).name}
-					width={"20%"}
-					heading="Country"
-					text={country}
-				/>
-			</Stack>
-		</Box>
-	);
-};
+export const UpdateSchoolDetails = React.memo(
+	({
+		board,
+		country,
+		heading,
+		percentage,
+		school,
+		yearOfCompletion,
+		fieldName,
+		register,
+		control,
+		errors,
+	}: UpdateSchoolDetailProps) => {
+		return (
+			<Box sx={{ margin: "2em 0" }}>
+				<Typography color={uiColor.gray} fontWeight={"600"} fontSize={"0.8rem"} variant="h5">
+					{heading}
+				</Typography>
+				<Stack direction={"row"} justifyContent={"space-between"} marginTop={"1em"} gap={"2%"}>
+					{/* TODO: Errors do not display in these fields */}
+					<UpdateInfoText
+						control={control}
+						error={errors[fieldName]?.message as string}
+						name={register(`${fieldName}.percentage`).name}
+						width={"20%"}
+						heading="Percentage"
+						text={`${percentage.toString()}%`}
+					/>
+					<UpdateInfoText
+						control={control}
+						error={errors[`${fieldName}.school`]?.message as string}
+						name={register(`${fieldName}.school`).name}
+						width={"30%"}
+						heading="School"
+						text={school}
+					/>
+					<UpdateInfoText
+						control={control}
+						error={errors[`${fieldName}.board`]?.message as string}
+						name={register(`${fieldName}.board`).name}
+						width={"20%"}
+						heading="Board"
+						text={board}
+					/>
+					<UpdateInfoText
+						control={control}
+						error={errors[`${fieldName}.yearOfCompletion`]?.message as string}
+						name={register(`${fieldName}.yearOfCompletion`).name}
+						width={"20%"}
+						heading="Year Of Completion"
+						text={yearOfCompletion}
+					/>
+					<UpdateInfoText
+						control={control}
+						error={errors[`${fieldName}.country`]?.message as string}
+						name={register(`${fieldName}.country`).name}
+						width={"20%"}
+						heading="Country"
+						text={country}
+					/>
+				</Stack>
+			</Box>
+		);
+	}
+);

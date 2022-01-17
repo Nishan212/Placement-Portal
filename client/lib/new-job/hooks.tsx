@@ -109,8 +109,6 @@ export const useNewJobForm = (): UseNewJobFormReturn => {
 		reValidateMode: "onChange",
 	});
 
-	const watchFields = watch();
-
 	const onSubmit = handleSubmit(data => {
 		console.log({ companyLogo, data, attachments });
 	});

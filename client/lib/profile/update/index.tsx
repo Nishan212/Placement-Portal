@@ -2,7 +2,7 @@
 import { Avatar, Box } from "@mui/material";
 import { Button } from "components";
 import { Save } from "@mui/icons-material";
-import React from "react";
+import React, { useRef } from "react";
 import {
 	PersonalDetails,
 	MainInfo,
@@ -13,7 +13,7 @@ import {
 	AcademicInfoContainer,
 	AcademicRecordContainer,
 	Semester,
-	UpdateProfileContainer,
+	UpdateProfileForm,
 	UpdateEntranceTest,
 	UpdateSchoolDetails,
 	UpdateStudentDetails,
@@ -33,8 +33,15 @@ const ProfileUpdate = () => {
 	});
 
 	return (
-		<UpdateProfileContainer onSubmit={handleFormSubmit}>
+		<UpdateProfileForm
+			noValidate
+			onSubmit={e => {
+				e.preventDefault();
+				handleFormSubmit();
+			}}
+		>
 			<pre>{JSON.stringify(watch(), null, 2)}</pre>
+			<pre>{JSON.stringify(errors, null, 2)}</pre>
 			<PersonalDetails>
 				<SectionHeading>Personal Details</SectionHeading>
 				<MainInfoRow>
@@ -91,7 +98,7 @@ const ProfileUpdate = () => {
 					/>
 				))}
 			</AcademicDetails>
-		</UpdateProfileContainer>
+		</UpdateProfileForm>
 	);
 };
 

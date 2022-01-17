@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { yupResolver } from "@hookform/resolvers/yup/dist/yup";
 import { Control, FieldErrors, useForm, UseFormRegister, UseFormWatch } from "react-hook-form";
 import * as yup from "yup";
@@ -19,13 +20,13 @@ export const useUpdateProfile = ({
 	academicDetails,
 	personalDetails,
 }: UseUpdateProfileArgs): UseUpdateProfileReturn => {
-	const parentSchema = yup.object({
+	const parentSchema = yup.object().shape({
 		name: yup.string().required("Name is required"),
 		mobileNumber: yup.string().required("Mobile number is required"),
 		occupation: yup.string().required("Occupation is required"),
 		organization: yup.string().required("Organization is required"),
 	});
-	const personalDetailsSchema = yup.object({
+	const personalDetailsSchema = yup.object().shape({
 		dateOfBirth: yup.string().required("Date of birth is required"),
 		gender: yup.string().required("Gender is required."),
 		caste: yup.string().required("Caste is required."),
@@ -49,13 +50,13 @@ export const useUpdateProfile = ({
 		currentAddress: yup.string().required("Current address is required."),
 	});
 
-	const entranceTestSchema = yup.object({
+	const entranceTestSchema = yup.object().shape({
 		jeeMainsRank: yup.string(),
 		jeeAdvancedRank: yup.string(),
 		metRank: yup.string(),
 	});
 
-	const schoolDetailsSchema = yup.object({
+	const schoolDetailsSchema = yup.object().shape({
 		percentage: yup.number().required("Percentage is required."),
 		school: yup.string().required("School is required."),
 		board: yup.string().required("Board is required."),
@@ -63,13 +64,13 @@ export const useUpdateProfile = ({
 		country: yup.string().required("Country is required."),
 	});
 
-	const academicDetailsSchema = yup.object({
+	const academicDetailsSchema = yup.object().shape({
 		entranceTest: entranceTestSchema.required("Entrance test details are required."),
 		tenth: schoolDetailsSchema.required("Tenth std details are required."),
-		twelfth: schoolDetailsSchema,
-		diploma: schoolDetailsSchema,
+		twelfth: schoolDetailsSchema.nullable(),
+		// diploma: schoolDetailsSchema.nullable(),
 	});
-	const formSchema = yup.object({
+	const formSchema = yup.object().shape({
 		personalDetails: personalDetailsSchema.required("Personal details are required."),
 		academicDetails: academicDetailsSchema.required("Academic details are required."),
 	});
@@ -89,6 +90,11 @@ export const useUpdateProfile = ({
 		shouldFocusError: true,
 		reValidateMode: "onChange",
 	});
+
+	useEffect(() => {
+		console.log({ dirtyFields });
+	}, [dirtyFields]);
+
 	const handleFormSubmit = handleSubmit(data => {
 		console.log({ data });
 		console.log({ dirtyFields });
