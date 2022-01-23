@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { yupResolver } from "@hookform/resolvers/yup/dist/yup";
+const { yupResolver } = require("@hookform/resolvers/yup");
 import { Control, FieldErrors, useForm, UseFormRegister, UseFormWatch } from "react-hook-form";
 import * as yup from "yup";
 import { FormInput } from "./types";
@@ -67,8 +67,8 @@ export const useUpdateProfile = ({
 	const academicDetailsSchema = yup.object().shape({
 		entranceTest: entranceTestSchema.required("Entrance test details are required."),
 		tenth: schoolDetailsSchema.required("Tenth std details are required."),
-		twelfth: schoolDetailsSchema.nullable(),
-		// diploma: schoolDetailsSchema.nullable(),
+		twelfth: schoolDetailsSchema.default(null).nullable(),
+		diploma: schoolDetailsSchema.default(null).nullable(),
 	});
 	const formSchema = yup.object().shape({
 		personalDetails: personalDetailsSchema.required("Personal details are required."),

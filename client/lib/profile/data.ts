@@ -72,7 +72,7 @@ export const schoolDetails = [
 
 export const student = {
 	dateOfBirth: "28/01/2001",
-	gender: "Male",
+	gender: "Female",
 	caste: "General",
 	height: "182",
 	weight: "70",

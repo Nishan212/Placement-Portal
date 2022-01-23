@@ -27,13 +27,16 @@ const ComboBox = <T extends { [key: string]: string | number } | string>({
 	freeSolo,
 	labelField,
 	error,
+	defaultValue,
 	helperText,
 	...props
 }: ComboBoxProps<T>) => {
 	return (
 		<Autocomplete
+		
 			sx={{ width }}
 			multiple={multiple}
+			defaultValue={defaultValue}
 			filterSelectedOptions={multiple ? true : false}
 			limitTags={2}
 			options={options}

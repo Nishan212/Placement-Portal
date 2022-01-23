@@ -188,7 +188,7 @@ export const UpdateInfoSelect = React.memo(
 					<Controller
 						name={name as Extract<keyof FormInput, string>}
 						control={control}
-						render={({ field: { onChange, ref, value, ...props } }) => (
+						render={({ field: { onChange, ref, value, ...props }, fieldState: { isDirty } }) => (
 							<ComboBox
 								error={!!error}
 								helperText={error}
@@ -216,7 +216,7 @@ export const UpdateInfoSelect = React.memo(
 									},
 								}}
 								fullWidth={fullWidth}
-								defaultValue={[text]}
+								value={isDirty ? value : text}
 								options={options}
 								onChange={(e, data) => onChange(data)}
 								{...props}
