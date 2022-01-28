@@ -1,5 +1,5 @@
 import { ApolloContext } from "../../../context";
-import { Job, QueryResolvers } from "../../../types/graphql";
+import { Job, JobDetails, QueryResolvers } from "../../../types/graphql";
 
 export const queries: QueryResolvers<ApolloContext, Job> = {
 	getAllJobs: async (_, {}, { prisma }) => {
@@ -13,6 +13,23 @@ export const queries: QueryResolvers<ApolloContext, Job> = {
 				},
 			},
 		});
+
+		return jobs;
+	},
+	getJobDetails: async (_, { jobID }, { prisma }) => {
+		const jobs: JobDetails | null = await prisma.job.findUnique({
+			where: {
+			  id: jobID,
+			},
+			include: {
+				company: true,
+				eligibility: {
+					include: {
+						branches: true,
+					},
+				},
+			},
+		  })
 
 		return jobs;
 	},
