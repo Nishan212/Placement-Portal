@@ -3,7 +3,7 @@ import { Job, JobDetails, QueryResolvers } from "../../../types/graphql";
 
 export const queries: QueryResolvers<ApolloContext, Job> = {
 	getAllJobs: async (_, {}, { prisma }) => {
-		const jobs: Job[] | null = await prisma.job.findMany({
+		const jobs: JobDetails[] | null = await prisma.job.findMany({
 			include: {
 				company: true,
 				eligibility: {
@@ -17,7 +17,7 @@ export const queries: QueryResolvers<ApolloContext, Job> = {
 		return jobs;
 	},
 	getJobDetails: async (_, { jobID }, { prisma }) => {
-		const jobs: JobDetails | null = await prisma.job.findUnique({
+		const jobs: Job | null = await prisma.job.findUnique({
 			where: {
 			  id: jobID,
 			},

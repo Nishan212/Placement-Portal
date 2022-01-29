@@ -166,6 +166,8 @@ const typeDefs = gql`
 		isSpot: Boolean!
 		shorlists: [Shortlist]
 		eligibility: Eligibility!
+		createdAt: DateTime
+		updatedAt: DateTime
 	}
 
 
@@ -225,8 +227,8 @@ const typeDefs = gql`
 	}
 
 	type Query {
-		getAllJobs: [Job]!
-		getJobDetails(jobID: String!):JobDetails
+		getAllJobs: [JobDetails]!
+		getJobDetails(jobID: String!):Job
 	}
 
 	input EligibilityInput {
