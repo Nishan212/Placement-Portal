@@ -209,6 +209,7 @@ const typeDefs = gql`
 
 	type Query {
 		getAllJobs: [Job]!
+		getJobDetails(jobID: String!):Job
 		getAllCompanies: [Company]!
 	}
 
