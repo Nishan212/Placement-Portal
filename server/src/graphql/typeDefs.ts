@@ -153,6 +153,7 @@ const typeDefs = gql`
 		updatedAt: DateTime
 	}
 
+
 	type Company {
 		id: String!
 		name: String!
@@ -203,6 +204,21 @@ const typeDefs = gql`
 		shortlists: [Shortlist]
 		physicalDisability: String
 
+		createdAt: DateTime
+		updatedAt: DateTime
+	}
+	type JobsDashboard {
+		id: String!
+		company: Company!
+		profile: String!
+		category: Category!
+		locations: [String!]!
+		ctc: Int
+		stipend: Int 
+		registrationStartDate: DateTime!
+		registrationDeadline: DateTime!
+		offerType: OfferType!
+		isSpot: Boolean!
 		createdAt: DateTime
 		updatedAt: DateTime
 	}
@@ -265,7 +281,7 @@ const typeDefs = gql`
 	}
 
 	input EducationInput {
-		tenth: AcademicsInput
+		tenth: AcademicsInput!
 		twefth: AcademicsInput
 		diploma: AcademicsInput
 		jeeMainRank: String
