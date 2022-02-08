@@ -5,10 +5,15 @@ export type CompanyType = {
 	ctc: number;
 	stipend: number;
 	profile: string;
-	offer: string;
+	offerType: string;
 	isSpot: boolean;
-	location: string[];
+	locations: string[];
 	category: string;
 	dates: string;
-	status: string;
+	company: {
+		name: string;
+		logo: string;
+	};
+	registrationStartDate: string;
+	registrationDeadline: string;
 };

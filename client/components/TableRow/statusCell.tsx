@@ -1,17 +1,22 @@
 import React from "react";
+import moment from "moment";
 import TableCell from "./../TableCell";
 import Typography from "@mui/material/Typography";
 import { useTheme } from "@mui/material";
 import { TableCellProps as MaterialTableCellProps } from "@mui/material/TableCell";
 import getBadgeColor from "../../utils/getBadgeColor";
 interface TableCellProps extends MaterialTableCellProps {
-	status: string;
-	dates: string;
+	registrationStartDate: string;
+	registrationDeadline: string;
 }
 
-const StatusCell = ({ status, dates }: TableCellProps) => {
+const StatusCell = ({ registrationStartDate, registrationDeadline }: TableCellProps) => {
+	console.log("registrationStartDate", moment(registrationStartDate).format());
+	console.log("registrationDeadline", moment(registrationDeadline).format());
+	let today = new Date();
+	console.log("today", moment(today).format());
 	const theme = useTheme();
-	const colors = getBadgeColor(theme.badgeColor, status);
+	const colors = getBadgeColor(theme.badgeColor, "PENDING");
 	return (
 		<TableCell>
 			<span
@@ -28,7 +33,7 @@ const StatusCell = ({ status, dates }: TableCellProps) => {
 			>
 				{status}
 			</span>
-			<Typography sx={{ fontSize: "0.5rem", marginTop: "0.75rem" }}> {dates}</Typography>
+			<Typography sx={{ fontSize: "0.5rem", marginTop: "0.75rem" }}> </Typography>
 		</TableCell>
 	);
 };

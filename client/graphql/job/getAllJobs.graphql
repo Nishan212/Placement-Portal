@@ -1,4 +1,4 @@
-query GetJobDetails {
+query GetAllJobs {
 	getAllJobs {
 		id
 		company {

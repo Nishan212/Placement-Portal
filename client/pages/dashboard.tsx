@@ -8,19 +8,23 @@ import TableBody from "./../components/TableBody";
 import TableContainer from "@mui/material/TableContainer";
 
 import { TABLE_HEADERS, COMPANIES } from "./../lib/dashboard/tempData";
-
+import { useJobs } from "lib/dashboard/hooks";
 const Dashboard: NextPage = () => {
+	const { jobs, loading } = useJobs();
+	console.log(loading, jobs);
 	return (
 		<MainLayout>
 			<Menubar />
 			<TableContainer sx={{ marginTop: "2%", maxHeight: "75vh" }}>
 				<Table>
 					<TableHead tableHeaders={TABLE_HEADERS} />
-					<TableBody>
-						{COMPANIES.map((company, index) => {
-							return <TableRow company={company} index={index} key={index.toString()} />;
-						})}
-					</TableBody>
+					{!loading && (
+						<TableBody>
+							{jobs.map((job, index) => {
+								return <TableRow job={job} index={index} key={index.toString()} />;
+							})}
+						</TableBody>
+					)}
 				</Table>
 			</TableContainer>
 		</MainLayout>
