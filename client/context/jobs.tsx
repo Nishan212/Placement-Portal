@@ -12,7 +12,7 @@ type JobsContextType = {
 const JobsContext = createContext<JobsContextType>({ fetchAllJobs: () => {} });
 
 function JobsProvider(props: any) {
-	const [jobs, setJobs] = useState<Jobs | undefined>([]);
+	const [jobs, setJobs] = useState<Jobs>([]);
 	const [fetchAllJobs, { loading }] = useGetAllJobsLazyQuery({
 		onCompleted: data => {
 			setJobs(data.getAllJobs);

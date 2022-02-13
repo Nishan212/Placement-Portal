@@ -1,7 +1,4 @@
 export type JobType = {
-	logo: string;
-	name: string;
-	registrations: number;
 	ctc: number;
 	stipend: number;
 	profile: string;
@@ -9,7 +6,6 @@ export type JobType = {
 	isSpot: boolean;
 	locations: string[];
 	category: string;
-	dates: string;
 	company: {
 		name: string;
 		logo: string;
