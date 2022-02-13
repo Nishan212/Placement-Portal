@@ -1,218 +1,11 @@
-generator client {
-  provider = "prisma-client-js"
-}
-
 datasource db {
   provider          = "postgresql"
   url               = env("DATABASE_URL")
   shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
-model Branch {
-  id           String        @id @default(uuid())
-  name         String
-  abbreviation String        @unique
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  users        User[]
-  eligibility  Eligibility[]
-}
-
-model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  userType  UserType @default(STUDENT)
-  branchID  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  branch    Branch   @relation(fields: [branchID], references: [id])
-  student   Student?
-
-  @@index([email])
-}
-
-model Parent {
-  id           String   @id @default(uuid())
-  name         String
-  phoneNumber  String
-  occupation   String
-  organization String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  father       Student? @relation("Father")
-  guardian     Student? @relation("Guardian")
-  mother       Student? @relation("Mother")
-}
-
-model Identification {
-  id             String   @id @default(uuid())
-  aadharNumber   String?
-  panNumber      String?
-  passportNumber String?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  student        Student?
-}
-
-model Academics {
-  id               String     @id @default(uuid())
-  score            Float
-  school           String
-  yearOfCompletion String
-  country          String
-  board            String
-  createdAt        DateTime   @default(now())
-  updatedAt        DateTime   @updatedAt
-  diploma          Education? @relation("Diploma")
-  tenth            Education? @relation("Tenth")
-  twelfth          Education? @relation("Twelfth")
-}
-
-model Semester {
-  id          String     @id @default(uuid())
-  name        String
-  gpa         Float
-  backlogs    Int        @default(0)
-  credits     Int
-  dateChanges Int        @default(0)
-  educationID String?
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  education   Education? @relation(fields: [educationID], references: [id])
-}
-
-model Education {
-  id              String     @id @default(uuid())
-  jeeMainRank     String?
-  metRank         String?
-  tenthID         String     @unique
-  diplomaID       String?    @unique
-  twelfthID       String?    @unique
-  jeeAdvancedRank String?
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime   @updatedAt
-  diploma         Academics? @relation("Diploma", fields: [diplomaID], references: [id])
-  tenth           Academics  @relation("Tenth", fields: [tenthID], references: [id])
-  twelfth         Academics? @relation("Twelfth", fields: [twelfthID], references: [id])
-  semesters       Semester[]
-  student         Student?
-}
-
-model Shortlist {
-  id        String    @id @default(uuid())
-  step      Step      @default(ELIGIBILITY)
-  jobID     String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  job       Job       @relation(fields: [jobID], references: [id])
-  students  Student[]
-}
-
-model Eligibility {
-  id                    String   @id @default(uuid())
-  cgpa                  Float?
-  tenthScore            Float?
-  twelfthScore          Float?
-  diplomaScore          Float?
-  numberOfBacklogs      Int?
-  additionalRequirement String?
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
-  job                   Job?
-  branches              Branch[]
-}
-
-model Job {
-  id                    String      @id @default(uuid())
-  companyID             String
-  category              Category    @default(CORE)
-  description           String
-  stipend               Int?
-  registrationDeadline  DateTime
-  hrContact             String
-  profile               String
-  offerType             OfferType   @default(P)
-  isSpot                Boolean     @default(true)
-  bond                  String?
-  eligibilityID         String      @unique
-  hasBond               Boolean     @default(false)
-  registrationStartDate DateTime    @default(now())
-  ctc                   Int?
-  locations             String[]
-  createdAt             DateTime    @default(now())
-  updatedAt             DateTime    @updatedAt
-  company               Company     @relation(fields: [companyID], references: [id])
-  eligibility           Eligibility @relation(fields: [eligibilityID], references: [id])
-  shortlists            Shortlist[]
-  students              Student[]
-}
-
-model Company {
-  id                 String              @id @default(uuid())
-  name               String
-  aboutCompany       String?
-  feedback           String?
-  logo               String?
-  createdAt          DateTime            @default(now())
-  updatedAt          DateTime            @updatedAt
-  companyPreferences CompanyPreference[]
-  jobs               Job[]
-}
-
-model CompanyPreference {
-  id         String   @id @default(uuid())
-  preference Int
-  studentID  String
-  companyID  String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  company    Company  @relation(fields: [companyID], references: [id])
-  student    Student  @relation(fields: [studentID], references: [userID])
-
-  @@unique([studentID, companyID])
-}
-
-model Student {
-  regNo              String              @unique
-  firstName          String
-  middleName         String?
-  lastName           String
-  altEmail           String
-  dateOfBirth        DateTime
-  phoneNumber        String              @unique
-  altPhoneNumber     String
-  height             String
-  weight             String
-  state              String
-  city               String
-  country            String
-  permanentAddress   String
-  currentAddress     String
-  linkedinID         String              @unique
-  preferredCompany   String?
-  physicalDisability String?             @default("NONE")
-  userID             String              @id @default(uuid())
-  fatherID           String?             @unique
-  motherID           String?             @unique
-  educationID        String              @unique
-  identificationID   String              @unique
-  skypeID            String              @unique
-  guardianID         String?             @unique
-  createdAt          DateTime            @default(now())
-  updatedAt          DateTime            @updatedAt
-  photo              String?
-  education          Education           @relation(fields: [educationID], references: [id])
-  father             Parent?             @relation("Father", fields: [fatherID], references: [id])
-  guardian           Parent?             @relation("Guardian", fields: [guardianID], references: [id])
-  identification     Identification      @relation(fields: [identificationID], references: [id])
-  mother             Parent?             @relation("Mother", fields: [motherID], references: [id])
-  user               User                @relation(fields: [userID], references: [id])
-  companyPreferences CompanyPreference[]
-  currentOffers      Job[]
-  shortlists         Shortlist[]
-
-  @@index([altEmail])
+generator client {
+  provider = "prisma-client-js"
 }
 
 enum UserType {
@@ -239,4 +32,231 @@ enum OfferType {
   P
   I
   P_PLUS_I
+}
+
+model Branch {
+  id           String        @id @default(uuid())
+  name         String
+  abbreviation String        @unique
+  users        User[]
+  eligibility  Eligibility[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  id       String   @id @default(uuid())
+  email    String   @unique
+  password String
+  userType UserType @default(STUDENT)
+
+  branchID String
+  branch   Branch   @relation(fields: [branchID], references: [id])
+  student  Student?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Parent {
+  id           String  @id @default(uuid())
+  name         String
+  phoneNumber  String
+  occupation   String
+  organization String?
+
+  father   Student? @relation("Father")
+  mother   Student? @relation("Mother")
+  guardian Student? @relation("Guardian")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Identification {
+  id             String  @id @default(uuid())
+  aadharNumber   String?
+  panNumber      String?
+  passportNumber String?
+
+  student Student?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Academics {
+  id               String @id @default(uuid())
+  score            Float
+  school           String
+  yearOfCompletion String
+  country          String
+  board            String
+
+  tenth   Education? @relation("Tenth")
+  twelfth Education? @relation("Twelfth")
+  diploma Education? @relation("Diploma")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Semester {
+  id          String @id @default(uuid())
+  name        String
+  gpa         Float
+  credits     Int
+  backlogs    Int    @default(0)
+  dateChanges Int    @default(0)
+
+  educationID String?
+  education   Education? @relation(fields: [educationID], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Education {
+  id              String     @id @default(uuid())
+  jeeMainRank     String?
+  jeeAdvancedRank String?
+  metRank         String?
+  semesters       Semester[]
+
+  tenthID   String     @unique
+  tenth     Academics  @relation(name: "Tenth", fields: [tenthID], references: [id])
+  twelfthID String?    @unique
+  twelfth   Academics? @relation(name: "Twelfth", fields: [twelfthID], references: [id])
+  diplomaID String?    @unique
+  diploma   Academics? @relation(name: "Diploma", fields: [diplomaID], references: [id])
+  student   Student?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Shortlist {
+  id       String    @id @default(uuid())
+  step     Step      @default(ELIGIBILITY)
+  students Student[]
+
+  jobID String
+  job   Job    @relation(fields: [jobID], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@unique([step, jobID])
+}
+
+model Eligibility {
+  id                    String   @id @default(uuid())
+  cgpa                  Float?
+  tenthScore            Float?
+  twelfthScore          Float?
+  diplomaScore          Float?
+  numberOfBacklogs      Int?
+  additionalRequirement String?
+  branches              Branch[]
+
+  job Job?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Job {
+  id                    String      @id @default(uuid())
+  profile               String
+  category              Category    @default(CORE)
+  description           String
+  locations             String[]
+  ctc                   Int?
+  stipend               Int?
+  registrationStartDate DateTime    @default(now())
+  registrationDeadline  DateTime
+  hrContact             String
+  offerType             OfferType   @default(P)
+  isSpot                Boolean     @default(true)
+  bond                  String?
+  hasBond               Boolean     @default(false)
+  shortlists            Shortlist[]
+  students              Student[]
+
+  eligibilityID String      @unique
+  eligibility   Eligibility @relation(fields: [eligibilityID], references: [id])
+  companyID     String
+  company       Company     @relation(fields: [companyID], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Company {
+  id                 String              @id @default(uuid())
+  name               String
+  logo               String?
+  aboutCompany       String?
+  feedback           String?
+  jobs               Job[]
+  companyPreferences CompanyPreference[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CompanyPreference {
+  id         String @id @default(uuid())
+  preference Int
+
+  studentID String
+  student   Student @relation(fields: [studentID], references: [userID])
+  companyID String
+  company   Company @relation(fields: [companyID], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([studentID, companyID])
+}
+
+model Student {
+  regNo              String              @unique
+  firstName          String
+  middleName         String?
+  lastName           String
+  altEmail           String
+  dateOfBirth        DateTime
+  phoneNumber        String              @unique
+  altPhoneNumber     String
+  height             String
+  weight             String
+  state              String
+  city               String
+  country            String
+  permanentAddress   String
+  currentAddress     String
+  skypeID            String              @unique
+  linkedinID         String              @unique
+  preferredCompany   String?
+  physicalDisability String?             @default("NONE")
+  companyPreferences CompanyPreference[]
+  currentOffers      Job[]
+  shortlists         Shortlist[]
+
+  userID           String         @id @default(uuid())
+  user             User           @relation(fields: [userID], references: [id])
+  fatherID         String?        @unique
+  father           Parent?        @relation(name: "Father", fields: [fatherID], references: [id])
+  motherID         String?        @unique
+  mother           Parent?        @relation(name: "Mother", fields: [motherID], references: [id])
+  guardianID       String?        @unique
+  guardian         Parent?        @relation(name: "Guardian", fields: [guardianID], references: [id])
+  identificationID String         @unique
+  identification   Identification @relation(fields: [identificationID], references: [id])
+  educationID      String         @unique
+  education        Education      @relation(fields: [educationID], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
