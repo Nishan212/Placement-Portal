@@ -1,4 +1,4 @@
-export type CompanyType = {
+export type JobType = {
 	logo: string;
 	name: string;
 	registrations: number;
@@ -16,4 +16,5 @@ export type CompanyType = {
 	};
 	registrationStartDate: string;
 	registrationDeadline: string;
+	numberOfregistrations: number;
 };

@@ -2,19 +2,20 @@ import MaterialTableRow, { TableRowProps as MaterialTableRowProps } from "@mui/m
 import TableCell from "./../TableCell";
 import { useTheme } from "@mui/material";
 import Stack from "@mui/material/Stack";
-import { CompanyType } from "../../lib/dashboard/companyType";
+import { JobType } from "../../lib/dashboard/jobType";
 import Typography from "@mui/material/Typography";
 import StatusCell from "./statusCell";
 import CompanyCell from "./companyCell";
 import { styled } from "@mui/material";
 interface TableRowProps extends MaterialTableRowProps {
 	index: number;
-	job: CompanyType;
+	job: JobType;
 }
 
 const SmallerTypography = styled(Typography)({
 	fontSize: "0.75rem",
 });
+
 const TableRow = ({ index, job }: TableRowProps) => {
 	const theme = useTheme();
 	const locations = job?.locations?.join(", ");
@@ -26,7 +27,7 @@ const TableRow = ({ index, job }: TableRowProps) => {
 			}}
 			key={job?.stipend + index}
 		>
-			<CompanyCell name={job?.company.name} logo={job?.company.logo} registrations={2} />
+			<CompanyCell name={job?.company.name} logo={job?.company.logo} registrations={job?.numberOfregistrations} />
 
 			<TableCell> {job?.ctc ? `${job?.ctc / 100000} LPA` : "-"}</TableCell>
 			<TableCell>{job?.stipend ? `${job?.stipend}K/month` : "-"}</TableCell>

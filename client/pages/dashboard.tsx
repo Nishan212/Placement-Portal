@@ -7,11 +7,10 @@ import TableRow from "./../components/TableRow";
 import TableBody from "./../components/TableBody";
 import TableContainer from "@mui/material/TableContainer";
 
-import { TABLE_HEADERS, COMPANIES } from "./../lib/dashboard/tempData";
+import { TABLE_HEADERS } from "./../lib/dashboard/tempData";
 import { useJobs } from "lib/dashboard/hooks";
 const Dashboard: NextPage = () => {
 	const { jobs, loading } = useJobs();
-	console.log(loading, jobs);
 	return (
 		<MainLayout>
 			<Menubar />
@@ -20,7 +19,7 @@ const Dashboard: NextPage = () => {
 					<TableHead tableHeaders={TABLE_HEADERS} />
 					{!loading && (
 						<TableBody>
-							{jobs.map((job, index) => {
+							{jobs?.map((job, index) => {
 								return <TableRow job={job} index={index} key={index.toString()} />;
 							})}
 						</TableBody>

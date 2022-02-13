@@ -15,12 +15,6 @@ query GetAllJobs {
 		registrationDeadline
 		offerType
 		isSpot
-		shortlist {
-			id
-			step
-			students {
-				id
-			}
-		}
+		numberOfregistrations
 	}
 }
